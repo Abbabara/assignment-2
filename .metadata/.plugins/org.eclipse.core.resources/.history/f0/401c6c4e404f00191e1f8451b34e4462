@@ -27,7 +27,6 @@ public class SchedulingGraphics implements ApplicationListener{
 
 	@Override
 	public void dispose() {
-		//test
 	// TODO Auto-generated method stub
 	}
 
