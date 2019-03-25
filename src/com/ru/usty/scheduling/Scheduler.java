@@ -2,12 +2,19 @@ package com.ru.usty.scheduling;
 
 import com.ru.usty.scheduling.process.ProcessExecution;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
 public class Scheduler {
 
 	ProcessExecution processExecution;
 	Policy policy;
 	int quantum;
-
+	Queue <Integer> fcfsQueue = new LinkedList<Integer>(); 
+	List<Integer> spnArray = new ArrayList();
+	int processRunning = -1;
 	/**
 	 * Add any objects and variables here (if needed)
 	 */
@@ -81,25 +88,108 @@ public class Scheduler {
 
 	}
 
+	
+
 	/**
 	 * DO NOT CHANGE DEFINITION OF OPERATION
 	 */
 	public void processAdded(int processID) {
+		switch(policy) {
+		case FCFS:	//First-come-first-served
+			
+			fcfsQueue.add(processID);
+			if(!fcfsQueue.isEmpty()) {
+				processExecution.switchToProcess(fcfsQueue.peek());	
+			}
+			
+			break;
+		case RR:	//Round robin
 
-		/**
-		 * Add scheduling code here
-		 */
-
+			break;
+		case SPN:	//Shortest process next
+			spnArray.add(processID);
+			if(processRunning == -1) {
+				processRunning = findShortest();
+				processExecution.switchToProcess(processRunning);	
+			} else {
+				processExecution.switchToProcess(processRunning);	
+			}
+			break;
+		case SRT:	//Shortest remaining time
+			
+			break;
+		case HRRN:	//Highest response ratio next
+		
+			break;
+		case FB:	//Feedback
+			break;
+		} 
+		
+		
 	}
+	
+
 
 	/**
 	 * DO NOT CHANGE DEFINITION OF OPERATION
 	 */
 	public void processFinished(int processID) {
+		
+		
+		switch(policy) {
+		case FCFS:	//First-come-first-served
+			fcfsQueue.remove();
+			System.out.println(fcfsQueue.size());
+			
+			if(!fcfsQueue.isEmpty()) {
+				processExecution.switchToProcess(fcfsQueue.peek());	
+			}
+			break;
+		case RR:	//Round robin
 
-		/**
-		 * Add scheduling code here
-		 */
+			break;
+		case SPN:	//Shortest process next
+			
 
+			if(!spnArray.isEmpty()) {
+				spnArray.remove(processRunning);
+				processRunning = -1;
+			}
+			break;
+		case SRT:	//Shortest remaining time
+			
+			break;
+		case HRRN:	//Highest response ratio next
+		
+			break;
+		case FB:	//Feedback
+			break;
+		} 
+	}
+	
+	private int getId(int processID) {
+		
+		for(int i = 0; i < spnArray.size(); i++) {
+			if(processID == spnArray.get(i)) {
+				return i;
+			}
+		}
+		return 0;
+	}
+	
+	private int findShortest() {
+
+		int shortestId = 0;
+		
+		for(int i = 0; i < spnArray.size(); i++) {
+			
+			long shortest = processExecution.getProcessInfo(spnArray.get(shortestId)).totalServiceTime;
+			long time = processExecution.getProcessInfo(spnArray.get(i)).totalServiceTime;
+			
+			if( time <= shortest) {
+				shortestId = i;
+			}
+		}
+		return shortestId;
 	}
 }
