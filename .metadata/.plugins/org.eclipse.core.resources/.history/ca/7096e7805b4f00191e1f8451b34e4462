@@ -14,8 +14,7 @@ public class Scheduler {
 	int quantum;
 	Queue <Integer> fcfsQueue = new LinkedList<Integer>(); 
 	List<Integer> spnArray = new ArrayList();
-	int processArrayPlace;
-	boolean processIsRunning = false;
+	int processRunning = -1;
 	/**
 	 * Add any objects and variables here (if needed)
 	 */
@@ -99,21 +98,22 @@ public class Scheduler {
 		case FCFS:	//First-come-first-served
 			
 			fcfsQueue.add(processID);
-			processExecution.switchToProcess(fcfsQueue.peek());	
-		
+			if(!fcfsQueue.isEmpty()) {
+				processExecution.switchToProcess(fcfsQueue.peek());	
+			}
+			
 			break;
 		case RR:	//Round robin
 
 			break;
 		case SPN:	//Shortest process next
 			spnArray.add(processID);
-			
-			if(processIsRunning == false) {
-				processIsRunning = true;
-				processArrayPlace = findShortest();	
+			if(processRunning == -1) {
+				processRunning = findShortest();
+				processExecution.switchToProcess(processRunning);	
+			} else {
+				processExecution.switchToProcess(processRunning);	
 			}
-			
-			processExecution.switchToProcess(spnArray.get(processArrayPlace));
 			break;
 		case SRT:	//Shortest remaining time
 			
@@ -149,12 +149,12 @@ public class Scheduler {
 
 			break;
 		case SPN:	//Shortest process next
-				spnArray.remove(processArrayPlace);
-				
-				if(!spnArray.isEmpty()) {
-					processArrayPlace = findShortest();
-					processExecution.switchToProcess(spnArray.get(processArrayPlace));
-				}
+			
+
+			if(!spnArray.isEmpty()) {
+				spnArray.remove(processRunning);
+				processRunning = -1;
+			}
 			break;
 		case SRT:	//Shortest remaining time
 			
@@ -167,19 +167,29 @@ public class Scheduler {
 		} 
 	}
 	
+	private int getId(int processID) {
+		
+		for(int i = 0; i < spnArray.size(); i++) {
+			if(processID == spnArray.get(i)) {
+				return i;
+			}
+		}
+		return 0;
+	}
+	
 	private int findShortest() {
 
-		int shortestArrayPlace = 0;
+		int shortestId = 0;
 		
 		for(int i = 0; i < spnArray.size(); i++) {
 			
-			long shortest = processExecution.getProcessInfo(spnArray.get(shortestArrayPlace)).totalServiceTime;
+			long shortest = processExecution.getProcessInfo(spnArray.get(shortestId)).totalServiceTime;
 			long time = processExecution.getProcessInfo(spnArray.get(i)).totalServiceTime;
 			
-			if( time < shortest) {
-				shortestArrayPlace = i;
+			if( time <= shortest) {
+				shortestId = i;
 			}
 		}
-		return shortestArrayPlace;
+		return shortestId;
 	}
 }

@@ -99,18 +99,21 @@ public class Scheduler {
 		case FCFS:	//First-come-first-served
 			
 			fcfsQueue.add(processID);
-			processExecution.switchToProcess(fcfsQueue.peek());	
-		
+			
+			if(!fcfsQueue.isEmpty()) {
+				processExecution.switchToProcess(fcfsQueue.peek());	
+			}
+			
 			break;
 		case RR:	//Round robin
 
 			break;
 		case SPN:	//Shortest process next
 			spnArray.add(processID);
-			
 			if(processIsRunning == false) {
 				processIsRunning = true;
-				processArrayPlace = findShortest();	
+				processArrayPlace = findShortest();
+					
 			}
 			
 			processExecution.switchToProcess(spnArray.get(processArrayPlace));
@@ -150,11 +153,8 @@ public class Scheduler {
 			break;
 		case SPN:	//Shortest process next
 				spnArray.remove(processArrayPlace);
-				
-				if(!spnArray.isEmpty()) {
-					processArrayPlace = findShortest();
-					processExecution.switchToProcess(spnArray.get(processArrayPlace));
-				}
+				processIsRunning = false;
+		
 			break;
 		case SRT:	//Shortest remaining time
 			
