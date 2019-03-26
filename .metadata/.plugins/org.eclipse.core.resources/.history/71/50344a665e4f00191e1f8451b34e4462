@@ -97,9 +97,8 @@ public class Scheduler {
 	public void processAdded(int processID) {
 		switch(policy) {
 		case FCFS:	//First-come-first-served
-			//adding the process to queue
+			
 			fcfsQueue.add(processID);
-			//switching to head of queue
 			processExecution.switchToProcess(fcfsQueue.peek());	
 		
 			break;
@@ -107,16 +106,13 @@ public class Scheduler {
 
 			break;
 		case SPN:	//Shortest process next
-			//adding process to Array
 			spnArray.add(processID);
 			
-			//If no process is running
 			if(processIsRunning == false) {
 				processIsRunning = true;
-				//finding the place of the shortest process in the array
-				processArrayPlace = findShortestInArray();	
+				processArrayPlace = findShortest();	
 			}
-			//switching to shortest process
+			
 			processExecution.switchToProcess(spnArray.get(processArrayPlace));
 			break;
 		case SRT:	//Shortest remaining time
@@ -128,6 +124,8 @@ public class Scheduler {
 		case FB:	//Feedback
 			break;
 		} 
+		
+		
 	}
 	
 
@@ -140,11 +138,10 @@ public class Scheduler {
 		
 		switch(policy) {
 		case FCFS:	//First-come-first-served
-			//remove head
 			fcfsQueue.remove();
+			System.out.println(fcfsQueue.size());
 			
 			if(!fcfsQueue.isEmpty()) {
-				//switching to head
 				processExecution.switchToProcess(fcfsQueue.peek());	
 			}
 			break;
@@ -152,15 +149,12 @@ public class Scheduler {
 
 			break;
 		case SPN:	//Shortest process next
-			//removing the finished process
-			spnArray.remove(processArrayPlace);
-			
-			if(!spnArray.isEmpty()) {
-				//finding the shortest process in array
-				processArrayPlace = findShortestInArray();
-				//switching to the shortest array
-				processExecution.switchToProcess(spnArray.get(processArrayPlace));
-			}
+				spnArray.remove(processArrayPlace);
+				
+				if(!spnArray.isEmpty()) {
+					processArrayPlace = findShortest();
+					processExecution.switchToProcess(spnArray.get(processArrayPlace));
+				}
 			break;
 		case SRT:	//Shortest remaining time
 			
@@ -173,19 +167,16 @@ public class Scheduler {
 		} 
 	}
 	
-	//Finding the shortest process
-	private int findShortestInArray() {
+	private int findShortest() {
 
 		int shortestArrayPlace = 0;
 		
 		for(int i = 0; i < spnArray.size(); i++) {
-			//time of the shortest known process
+			
 			long shortest = processExecution.getProcessInfo(spnArray.get(shortestArrayPlace)).totalServiceTime;
-			//time of the process we are comparing
 			long time = processExecution.getProcessInfo(spnArray.get(i)).totalServiceTime;
 			
 			if( time < shortest) {
-				//changing the shortest process
 				shortestArrayPlace = i;
 			}
 		}
