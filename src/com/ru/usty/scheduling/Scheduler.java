@@ -12,8 +12,8 @@ public class Scheduler {
 	ProcessExecution processExecution;
 	Policy policy;
 	int quantum;
-	Queue <Integer> fcfsQueue = new LinkedList<Integer>(); 
-	List<Integer> array = new ArrayList();
+	Queue <Integer> queue = new LinkedList<Integer>(); 
+	List<Integer> array = new ArrayList<Integer>();
 	int processArrayPlace;
 	boolean processIsRunning = false;
 	/**
@@ -98,13 +98,26 @@ public class Scheduler {
 		switch(policy) {
 		case FCFS:	//First-come-first-served
 			//adding the process to queue
-			fcfsQueue.add(processID);
+			queue.add(processID);
 			//switching to head of queue
-			processExecution.switchToProcess(fcfsQueue.peek());	
+			processExecution.switchToProcess(queue.peek());	
 		
 			break;
 		case RR:	//Round robin
-
+			/*queue.add(processID);
+			
+			System.out.println(queue);
+			if(!queue.isEmpty()) {
+				processExecution.switchToProcess(queue.peek());
+				
+				if(processExecution.getProcessInfo(queue.peek()).elapsedExecutionTime 
+						< processExecution.getProcessInfo(queue.peek()).totalServiceTime) {
+					queue.add(queue.peek());
+					System.out.println(queue);
+				}
+				queue.remove();
+				System.out.println(queue);
+			} */
 			break;
 		case SPN:	//Shortest process next
 			//adding process to Array
@@ -120,7 +133,14 @@ public class Scheduler {
 			processExecution.switchToProcess(array.get(processArrayPlace));
 			break;
 		case SRT:	//Shortest remaining time
+			//adding process to Array
+			array.add(processID);
 			
+	
+			//finding the place of the shortest process in the array
+			processArrayPlace = findShortestElapsedExecutionTimeInArray();	
+			//switching to shortest process
+			processExecution.switchToProcess(array.get(processArrayPlace));
 			break;
 		case HRRN:	//Highest response ratio next
 			array.add(processID);
@@ -146,15 +166,15 @@ public class Scheduler {
 		switch(policy) {
 		case FCFS:	//First-come-first-served
 			//remove head
-			fcfsQueue.remove();
+			queue.remove();
 			
-			if(!fcfsQueue.isEmpty()) {
+			if(!queue.isEmpty()) {
 				//switching to head
-				processExecution.switchToProcess(fcfsQueue.peek());	
+				processExecution.switchToProcess(queue.peek());	
 			}
 			break;
 		case RR:	//Round robin
-
+	
 			break;
 		case SPN:	//Shortest process next
 			//removing the finished process
@@ -165,10 +185,22 @@ public class Scheduler {
 				processArrayPlace = findShortestInArray();
 				//switching to the shortest array
 				processExecution.switchToProcess(array.get(processArrayPlace));
+			} else {
+				processArrayPlace = -0;
 			}
 			break;
 		case SRT:	//Shortest remaining time
+			//removing the finished process
+			array.remove(processArrayPlace);
 			
+			if(!array.isEmpty()) {
+				//finding the shortest process in array
+				processArrayPlace = findShortestElapsedExecutionTimeInArray();
+				//switching to the shortest array
+				processExecution.switchToProcess(array.get(processArrayPlace));
+			} else {
+				processArrayPlace = -0;
+			}
 			break;
 		case HRRN:	//Highest response ratio next
 			array.remove(processArrayPlace);
@@ -178,6 +210,8 @@ public class Scheduler {
 				processArrayPlace = findHighestResponseRatioNext();
 				//switching to the shortest array
 				processExecution.switchToProcess(array.get(processArrayPlace));
+			} else {
+				processArrayPlace = -0;
 			}
 			break;
 		case FB:	//Feedback
@@ -189,34 +223,61 @@ public class Scheduler {
 	private int findShortestInArray() {
 
 		int shortestArrayPlace = 0;
+		//time of the shortest known process
+		long shortest = processExecution.getProcessInfo(array.get(shortestArrayPlace)).totalServiceTime;
 		
 		for(int i = 0; i < array.size(); i++) {
-			//time of the shortest known process
-			long shortest = processExecution.getProcessInfo(array.get(shortestArrayPlace)).totalServiceTime;
+
 			//time of the process we are comparing
 			long time = processExecution.getProcessInfo(array.get(i)).totalServiceTime;
 			
 			if( time < shortest) {
 				//changing the shortest process
 				shortestArrayPlace = i;
+				shortest = time;
 			}
 		}
 		return shortestArrayPlace;
 	}
 	
+	private int findShortestElapsedExecutionTimeInArray() {
+
+		int shortestArrayPlace = 0;
+		
+		long shortest = processExecution.getProcessInfo(array.get(shortestArrayPlace)).totalServiceTime -
+				processExecution.getProcessInfo(array.get(shortestArrayPlace)).elapsedExecutionTime;
+		
+		for(int i = 0; i < array.size(); i++) {
+
+			//time of the process we are comparing
+			long time = processExecution.getProcessInfo(array.get(i)).totalServiceTime -
+					processExecution.getProcessInfo(array.get(i)).elapsedExecutionTime;
+			
+			if( time < shortest) {
+				//changing the shortest process
+				shortestArrayPlace = i;
+				shortest = time;
+			}
+		}
+		return shortestArrayPlace;
+	}
 
 	
 	private int findHighestResponseRatioNext() {
 		int highestResponseRatio = 0;
 		
+		long highest = r(processExecution.getProcessInfo(array.get(highestResponseRatio)).elapsedWaitingTime, 
+				processExecution.getProcessInfo(array.get(highestResponseRatio)).totalServiceTime);
+		
 		for(int i = 0; i < array.size(); i++) {
-			long highest =r(processExecution.getProcessInfo(array.get(highestResponseRatio)).elapsedWaitingTime, 
-					processExecution.getProcessInfo(array.get(highestResponseRatio)).totalServiceTime);
+
+			
 			long current =r(processExecution.getProcessInfo(array.get(i)).elapsedWaitingTime, 
 					processExecution.getProcessInfo(array.get(i)).totalServiceTime);
 			
 			if (current > highest) {
 				highestResponseRatio = i;
+				highest = current;
 			}
 		}
 		
