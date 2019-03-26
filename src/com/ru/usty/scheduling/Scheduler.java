@@ -284,6 +284,6 @@ public class Scheduler {
 		return highestResponseRatio;	
 	}
 	private long r(long x, long y) {
-		return (x + y)/y;
+		return (x + y) / y;
 	}
 }
