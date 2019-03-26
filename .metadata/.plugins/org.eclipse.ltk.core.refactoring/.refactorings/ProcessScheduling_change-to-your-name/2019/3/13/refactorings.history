@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename field &apos;spnArray&apos; in &apos;com.ru.usty.scheduling.Scheduler&apos; to &apos;array&apos;&#x0A;- Original project: &apos;ProcessScheduling_change-to-your-name&apos;&#x0A;- Original element: &apos;com.ru.usty.scheduling.Scheduler.spnArray&apos;&#x0A;- Renamed element: &apos;com.ru.usty.scheduling.Scheduler.array&apos;&#x0A;- Update references to refactored element&#x0A;- Update textual occurrences in comments and strings" delegate="false" deprecate="false" description="Rename field &apos;spnArray&apos;" flags="589830" getter="false" id="org.eclipse.jdt.ui.rename.field" input="/src&lt;com.ru.usty.scheduling{Scheduler.java[Scheduler^spnArray" name="array" references="true" setter="false" stamp="1553560469046" textual="false" version="1.0"/>
+</session>

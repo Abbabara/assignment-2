@@ -123,12 +123,7 @@ public class Scheduler {
 			
 			break;
 		case HRRN:	//Highest response ratio next
-			array.add(processID);
-			if(processIsRunning == false) {
-				processIsRunning = true;
-				processArrayPlace = findHighestResponseRatioNext();
-			}
-			processExecution.switchToProcess(array.get(processArrayPlace));
+		
 			break;
 		case FB:	//Feedback
 			break;
@@ -171,14 +166,7 @@ public class Scheduler {
 			
 			break;
 		case HRRN:	//Highest response ratio next
-			array.remove(processArrayPlace);
-			
-			if(!array.isEmpty()) {
-				//finding the shortest process in array
-				processArrayPlace = findHighestResponseRatioNext();
-				//switching to the shortest array
-				processExecution.switchToProcess(array.get(processArrayPlace));
-			}
+		
 			break;
 		case FB:	//Feedback
 			break;
@@ -202,27 +190,5 @@ public class Scheduler {
 			}
 		}
 		return shortestArrayPlace;
-	}
-	
-
-	
-	private int findHighestResponseRatioNext() {
-		int highestResponseRatio = 0;
-		
-		for(int i = 0; i < array.size(); i++) {
-			long highest =r(processExecution.getProcessInfo(array.get(highestResponseRatio)).elapsedWaitingTime, 
-					processExecution.getProcessInfo(array.get(highestResponseRatio)).totalServiceTime);
-			long current =r(processExecution.getProcessInfo(array.get(i)).elapsedWaitingTime, 
-					processExecution.getProcessInfo(array.get(i)).totalServiceTime);
-			
-			if (current > highest) {
-				highestResponseRatio = i;
-			}
-		}
-		
-		return highestResponseRatio;	
-	}
-	private long r(long x, long y) {
-		return (x + y)/y;
 	}
 }
